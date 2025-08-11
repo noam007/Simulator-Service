@@ -1,0 +1,39 @@
+from fastapi import FastAPI, HTTPException, Depends
+from pydantic import BaseModel
+import redis.asyncio as redis
+from typing import List, Optional
+
+app = FastAPI()
+
+# Redis connection pool
+async def get_redis():
+    redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+    try:
+        yield redis_client
+    finally:
+        await redis_client.close()
+
+# Your models and endpoints here
+class DeviceBase(BaseModel):
+    name: str
+    type: str
+    status: str
+
+class Device(DeviceBase):
+    id: str
+    online: bool
+
+@app.get("/devices", response_model=List[Device])
+async def get_devices(r: redis.Redis = Depends(get_redis)):
+# Implement logic to get devices from Redis
+    pass
+
+@app.get("/devices/{device_id}", response_model=Device)
+async def get_device(device_id: str, r: redis.Redis = Depends(get_redis)):
+# Implement logic to get a specific device from Redis
+    pass
+
+@app.post("/devices/{device_id}/command")
+async def send_command(device_id: str, command: dict, r: redis.Redis = Depends(get_redis)):
+# Implement logic to send a command to a device
+    pass

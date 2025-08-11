@@ -1,0 +1,4 @@
+# pythest == 6.5.2
+# pytest asinc
+# restAPI
+# Pydantic  (vlaidator restriction, and moduler - rest API is using it )
