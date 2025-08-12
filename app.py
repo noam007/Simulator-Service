@@ -26,14 +26,29 @@ class Device(DeviceBase):
 @app.get("/devices", response_model=List[Device])
 async def get_devices(r: redis.Redis = Depends(get_redis)):
 # Implement logic to get devices from Redis
-    pass
+    device_ids = await r.smembers("device_ids")    #
+    devices = []
+    for device_id in device_ids:
+        data = await r.hgetall(f"device:{device_id}")
+        if data:
+            devices.append(Device(**data))
+    return devices
+
 
 @app.get("/devices/{device_id}", response_model=Device)
 async def get_device(device_id: str, r: redis.Redis = Depends(get_redis)):
 # Implement logic to get a specific device from Redis
-    pass
+    data = await r.hgetall(f"device:{device_id}")
+    if not data:
+        raise HTTPException(status_code=404, detail="Device not found")
+    return Device(**data)
+
 
 @app.post("/devices/{device_id}/command")
 async def send_command(device_id: str, command: dict, r: redis.Redis = Depends(get_redis)):
 # Implement logic to send a command to a device
-    pass
+    exists = await r.exists(f"device:{device_id}")
+    if not exists:
+        raise HTTPException(status_code=404, detail="Device not found")
+    await r.rpush(f"device:{device_id}:commands", str(command))
+    return {"message": f"Command sent to device {device_id}"}
