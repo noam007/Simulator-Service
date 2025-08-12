@@ -4,6 +4,8 @@ import json
 @pytest.mark.asyncio
 async def test_get_devices(client, redis_client, sample_device):
 # Test implementation
+    async for i in sample_device:
+        sample_device = i
     response = client.get("/devices")
     assert response.status_code == 200
     devices = response.json()

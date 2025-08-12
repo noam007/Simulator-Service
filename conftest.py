@@ -26,6 +26,9 @@ def client():
 
 @pytest.fixture
 async def sample_device(redis_client):
+
+    async for i in redis_client:
+        redis_client = i
 # Create a sample device in Redis
     device_id = "device-1"
     device_data = {
@@ -34,11 +37,11 @@ async def sample_device(redis_client):
         "status": "normal",
         "online": "true"
     }
-
+    await redis_client.sadd("device_ids", device_id)
 # Store in Redis
     await redis_client.hset(f"device:{device_id}", mapping=device_data)
-
+    print("await happened")
     yield {"id": device_id, **device_data}
 
 # Clean up
-    await redis_client.delete(f"device:{device_id}")
+    #await redis_client.delete(f"device:{device_id}")

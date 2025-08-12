@@ -1,7 +1,6 @@
 import asyncio
 import redis.asyncio as redis
 
-
 async def setup_devices(redis_client):
     devices = {
         "device-1": {
@@ -46,9 +45,9 @@ async def delete_devices(redis_client):
 async def main():
     redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 
-    # למשל, אם אתה רוצה למחוק ואז להוסיף:
-    # await delete_devices(redis_client)
-    await setup_devices(redis_client)
+
+    await delete_devices(redis_client)
+    # await setup_devices(redis_client)
 
     await redis_client.aclose()
 

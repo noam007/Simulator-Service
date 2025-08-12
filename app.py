@@ -25,13 +25,13 @@ class Device(DeviceBase):
 
 @app.get("/devices", response_model=List[Device])
 async def get_devices(r: redis.Redis = Depends(get_redis)):
+# Implement logic to get devices from Redis
     device_ids = await r.smembers("device_ids")
     devices = []
     for device_id in device_ids:
         data = await r.hgetall(f"device:{device_id}")
         if data:
-            data["id"] = device_id
-            devices.append(Device(**data))
+            devices.append(Device(id=device_id,**data))
     return devices
 
 
