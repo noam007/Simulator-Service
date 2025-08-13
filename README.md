@@ -64,7 +64,7 @@ Returns a list of all devices stored in Redis.
 
 Returns details of a single device.
 
-## Example Response:**
+**Example Response:**
 
 ```
 json
