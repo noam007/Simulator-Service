@@ -60,10 +60,11 @@ Returns a list of all devices stored in Redis.
 ```
 
 
-GET /devices/{device_id}
+### GET /devices/{device_id}
+
 Returns details of a single device.
 
-## Example Response:
+## Example Response:**
 
 ```
 json
