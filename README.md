@@ -49,7 +49,7 @@ Returns a list of all devices stored in Redis.
 
 **Example Response:**
 
-json
+'''json
 [
   {
     "id": "device-1",
@@ -59,7 +59,7 @@ json
     "online": true
   }
 ]
-
+'''
 
 GET /devices/{device_id}
 Returns details of a single device.
