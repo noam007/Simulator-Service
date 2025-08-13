@@ -65,6 +65,7 @@ Returns details of a single device.
 
 ## Example Response:
 
+[
 json
 {
   "id": "device-1",
@@ -73,7 +74,7 @@ json
   "status": "normal",
   "online": true
 }
-
+]
 
 **Error:** Returns 404 if device is not found.
 
