@@ -61,7 +61,7 @@ Returns a list of all devices stored in Redis.
 ]
 ---
 
-### `GET /devices/{device_id}`
+# `GET /devices/{device_id}`
 
 Returns details of a single device.
 
@@ -115,4 +115,3 @@ Tests will:
 * Device data is stored as a Redis **hash** (`HSET`), commands are stored in a **list** (`RPUSH`).
 * Pagination for `/devices` is not yet implemented but can be added using SCAN cursors.
 
-* 
