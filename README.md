@@ -21,7 +21,7 @@ It provides REST endpoints to:
   httpx
 
 Install dependencies with:
-# pip install -r requirements.txt
+pip install -r requirements.txt
 
 ## File Structure
 app.py                # Main FastAPI application with Redis integration
