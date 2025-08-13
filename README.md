@@ -25,7 +25,9 @@ pip install -r requirements.txt
 
 ## File Structure
 app.py                # Main FastAPI application with Redis integration
+
 test_app.py           # API test cases for endpoints
+
 conftest.py           # Pytest fixtures for Redis and FastAPI client setup
 
 ## Running the Application
