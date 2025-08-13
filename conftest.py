@@ -32,16 +32,16 @@ async def sample_device(redis_client):
 # Create a sample device in Redis
     device_id = "device-1"
     device_data = {
+        "id": device_id,
         "name": "Test Device",
         "type": "temperature_sensor",
         "status": "normal",
         "online": "true"
     }
-    await redis_client.sadd("device_ids", device_id)
 # Store in Redis
     await redis_client.hset(f"device:{device_id}", mapping=device_data)
     print("await happened")
     yield {"id": device_id, **device_data}
 
 # Clean up
-    #await redis_client.delete(f"device:{device_id}")
+    # await redis_client.delete(f"device:{device_id}")

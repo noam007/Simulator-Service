@@ -17,6 +17,14 @@ async def test_get_devices(client, redis_client, sample_device):
 @pytest.mark.asyncio
 async def test_send_command(client, redis_client, sample_device):
 # Test sending a command to a device
+    async for i in sample_device:
+        sample_device = i
+        break
+
+ #   async for i in redis_client:
+ #       print(i)
+ #       redis_client = i
+
     command = {"action": "measure", "parameters": {"unit": "celsius"}}
 
     response = client.post(f"/devices/{sample_device['id']}/command", json=command)

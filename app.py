@@ -25,13 +25,25 @@ class Device(DeviceBase):
 
 @app.get("/devices", response_model=List[Device])
 async def get_devices(r: redis.Redis = Depends(get_redis)):
-# Implement logic to get devices from Redis
-    device_ids = await r.smembers("device_ids")
+    # Implement logic to get devices from Redis
+    prefix = "device:*"
+
+    # Use SCAN to iterate over keys with the prefix
+    cursor = 0
+    device_ids = []
+
+    # TODO: extend API for pagination
+    while True:
+        cursor, keys = await r.scan(cursor=cursor, match=prefix, count=100)
+        device_ids.extend(keys)
+        if cursor == 0:
+            break
+
     devices = []
     for device_id in device_ids:
-        data = await r.hgetall(f"device:{device_id}")
+        data = await r.hgetall(device_id)
         if data:
-            devices.append(Device(id=device_id,**data))
+            devices.append(Device(**data))
     return devices
 
 
