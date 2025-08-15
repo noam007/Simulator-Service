@@ -3,6 +3,7 @@ import redis.asyncio as redis
 import random
 
 async def setup_devices(redis_client):
+    """ setting up devices using specific device list and random"""
     device_data_list = [
         {
             "name": "Cisco 4451-X ISR",
@@ -24,6 +25,7 @@ async def setup_devices(redis_client):
         }
     ]
 
+    # adding random devices
     created_devices = []
     for data in device_data_list:
         device_id = "device_id" + str(random.randint(1, 100))
@@ -36,6 +38,7 @@ async def setup_devices(redis_client):
 
 
 async def delete_devices(redis_client):
+    """removing all devices from DB """
     device_keys = []
     async for key in redis_client.scan_iter(match="device:*"):
         device_keys.append(key)
@@ -45,6 +48,7 @@ async def delete_devices(redis_client):
         await redis_client.delete(key)
 
 async def get_names(redis_client):
+    """getting device list """
     device_keys = []
     async for key in redis_client.scan_iter(match="device:*"):
         device_keys.append(key)
@@ -58,6 +62,7 @@ async def get_names(redis_client):
 
 async def create_device(redis_client):
     """Creates a single device in Redis and cleans it up after the test."""
+    device_id = "device_id" + str(random.randint(1, 100))
     device_id = "test-device-456"  # You can use a static ID or generate a new one
     device_data = {
         "id": device_id,
@@ -67,20 +72,17 @@ async def create_device(redis_client):
         "online": "true"
     }
 
+
+
     # Store the device data in a Redis Hash
     await redis_client.hset(f"device:{device_id}", mapping=device_data)
 
 
 async def add_comment_to_device(redis_client, device_id, comment):
+    """adding a comment for a device """
     print(device_id,comment)
-    # await redis_client.hset(f"device:{device_id}", key="comment", value=comment)
-    await redis_client.hset(f"device:{device_id}", key="comment", value="hello_commensdfsdft")
+    await redis_client.hset(f"device:{device_id}", key="comment", value=comment)
     print(f"Comment added to device '{device_id}'.")
-
-
-
-
-
 
 
 async def main():
@@ -88,21 +90,37 @@ async def main():
     await redis_client.ping()
     print("Connected to Redis successfully!")
 
+    while True:
+        print("\n--- Redis Device Management Menu ---")
+        print("1. Create a single device")
+        print("2. Create multiple sample devices")
+        print("3. Delete all devices")
+        print("4. Get all device names")
+        print("5. Add a comment to a device")
+        print("6. Exit")
 
-    ### create singe device
-    # await create_device(redis_client)
+        choice = input("Enter your choice (1-6): ")
 
-    ### create singe device
-    # await setup_devices(redis_client)
-
-    ### delete devices
-    # await delete_devices(redis_client)
-
-    ### get all Redis devices names:
-    # await get_names(redis_client)
-
-    ### add a Comment to device:
-    await add_comment_to_device(redis_client, "test-device-456", "hello world")
+        if choice == '1':
+            await create_device(redis_client)
+            print("Single device created.")
+        elif choice == '2':
+            await setup_devices(redis_client)
+            print("Multiple devices created.")
+        elif choice == '3':
+            await delete_devices(redis_client)
+            print("All devices deleted.")
+        elif choice == '4':
+            await get_names(redis_client)
+        elif choice == '5':
+            device_id = input("Enter the device ID: ")
+            comment = input("Enter the comment: ")
+            await add_comment_to_device(redis_client, device_id, comment)
+        elif choice == '6':
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please enter a number between 1 and 6.")
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 import redis.asyncio as redis
 from typing import List, Optional
+import redis.exceptions as redis_e
 
 app = FastAPI()
 
@@ -9,7 +10,10 @@ app = FastAPI()
 async def get_redis():
     redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
     try:
+        await redis_client.ping()
         yield redis_client
+    except redis_e.ConnectionError as e:
+        raise HTTPException(status_code=503, detail=f"Redis connection failed: {str(e)}")
     finally:
         await redis_client.close()
 
@@ -43,7 +47,9 @@ async def get_devices(r: redis.Redis = Depends(get_redis)):
     for device_id in device_ids:
         data = await r.hgetall(device_id)
         if data:
+            print(Device(**data))
             devices.append(Device(**data))
+        print()
     return devices
 
 
@@ -64,3 +70,19 @@ async def send_command(device_id: str, command: dict, r: redis.Redis = Depends(g
         raise HTTPException(status_code=404, detail="Device not found")
     await r.rpush(f"device:{device_id}:commands", str(command))
     return {"message": f"Command sent to device {device_id}"}
+
+
+@app.delete("/devices/{device_id}", status_code=204)
+async def delete_device(device_id: str, r: redis.Redis = Depends(get_redis)):
+    device_key = f"device:{device_id}"
+    exists = await r.exists(device_key)
+    if not exists:
+        raise HTTPException(status_code=404, detail="Device not found")
+
+    pipeline = r.pipeline()
+    await pipeline.delete(device_key)
+    await pipeline.delete(f"{device_key}:commands")
+
+    await pipeline.execute()
+
+    return {f"device {device_key} was removed"}
