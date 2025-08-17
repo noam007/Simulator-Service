@@ -58,6 +58,8 @@ async def get_names(redis_client):
     else:
         print(device_keys)
 
+    return device_keys
+
 
 
 async def create_device(redis_client):
@@ -72,8 +74,6 @@ async def create_device(redis_client):
         "online": "true"
     }
 
-
-
     # Store the device data in a Redis Hash
     await redis_client.hset(f"device:{device_id}", mapping=device_data)
 
@@ -83,6 +83,42 @@ async def add_comment_to_device(redis_client, device_id, comment):
     print(device_id,comment)
     await redis_client.hset(f"device:{device_id}", key="comment", value=comment)
     print(f"Comment added to device '{device_id}'.")
+
+
+async def modify_field_value(redis_client,device_list):
+    """ Fetch all devices and their full data as list of dicts."""
+    devices = []
+    async for key in redis_client.scan_iter(match="device:*"):
+        device_data = await redis_client.hgetall(key)
+        if device_data:
+            devices.append(device_data)
+
+    if not devices:
+        print("No devices found in Redis.")
+    else:
+        print("\n--- All Devices in Redis ---")
+        index  = 0
+        for dev in devices:
+            print(f"device index {index} is : {dev}")
+            index += 1
+
+    """modify field value of a device """
+
+    if devices:
+        # TODO: add protection mechanism
+        device_choice = input(f"Enter your device ID (0-{index-1}): ")
+        change_field = input(f"Enter field choice:")
+        value_to_chane = input(f"Enter value to change:")
+
+        device_choice_id = devices[int(device_choice)]["id"]
+
+        await redis_client.hset(
+            f"device:{device_choice_id}",
+            key=f"{change_field}",
+            value=f"{value_to_chane}"
+        )
+
+
 
 
 async def main():
@@ -97,7 +133,8 @@ async def main():
         print("3. Delete all devices")
         print("4. Get all device names")
         print("5. Add a comment to a device")
-        print("6. Exit")
+        print("6. Modify field value")
+        print("7. Exit")
 
         choice = input("Enter your choice (1-6): ")
 
@@ -117,6 +154,10 @@ async def main():
             comment = input("Enter the comment: ")
             await add_comment_to_device(redis_client, device_id, comment)
         elif choice == '6':
+            device_list = await get_names(redis_client)
+            print(device_list)
+            await modify_field_value(redis_client,device_list)
+        elif choice == '7':
             print("Exiting...")
             break
         else:

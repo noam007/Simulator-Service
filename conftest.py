@@ -44,4 +44,4 @@ async def sample_device(redis_client):
     yield {"id": device_id, **device_data}
 
 # Clean up
-    # await redis_client.delete(f"device:{device_id}")
+ #   await redis_client.delete(f"device:{device_id}")
