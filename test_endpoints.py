@@ -18,7 +18,6 @@ async def test_get_devices(client, redis_client, sample_device):
 @pytest.mark.asyncio
 async def test_create_and_delete_device(client,redis_client,sample_device):
     """ this test will create and delete a single device """
-
     sample_device_dict = []
 
     async for device_data in sample_device:
@@ -39,24 +38,20 @@ async def test_create_and_delete_device(client,redis_client,sample_device):
 
 @pytest.mark.asyncio
 async def test_send_command(client, redis_client, sample_device):
-# Test sending a command to a device
+    """ Test sending a command to a device """
     async for i in sample_device:
         sample_device = i
         break
-
- #   async for i in redis_client:
- #       print(i)
- #       redis_client = i
 
     command = {"action": "measure", "parameters": {"unit": "celsius"}}
 
     response = client.post(f"/devices/{sample_device['id']}/command", json=command)
     assert response.status_code == 200
 
-# Verify command was stored in Redis
+    # Verify command was stored in Redis
     command_history = await redis_client.lrange(f"device:{sample_device['id']}:commands", 0, -1)
     assert len(command_history) > 0
 
-# Parse the most recent command
+    # Parse the most recent command
     last_command = json.loads(command_history[0])
     assert last_command["action"] == "measure"

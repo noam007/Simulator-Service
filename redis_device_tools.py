@@ -25,7 +25,7 @@ async def setup_devices(redis_client):
         }
     ]
 
-    # adding random devices
+    # adding random device ID's
     created_devices = []
     for data in device_data_list:
         device_id = "device_id" + str(random.randint(1, 100))
@@ -47,6 +47,7 @@ async def delete_devices(redis_client):
         print(key)
         await redis_client.delete(key)
 
+
 async def get_names(redis_client):
     """getting device list """
     device_keys = []
@@ -59,7 +60,6 @@ async def get_names(redis_client):
         print(device_keys)
 
     return device_keys
-
 
 
 async def create_device(redis_client):
@@ -117,8 +117,6 @@ async def modify_field_value(redis_client,device_list):
             key=f"{change_field}",
             value=f"{value_to_chane}"
         )
-
-
 
 
 async def main():

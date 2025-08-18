@@ -109,6 +109,50 @@ Tests will:
 * Create a sample device
 * Validate `/devices` and `/devices/{id}/command` behavior
 
+## Basic Jenkins pipeline:
+
+```
+pipeline {
+    agent any
+
+    environment {
+        VENV = "${WORKSPACE}/venv"
+    }
+
+    stages {
+        stage('Setup Python') {
+            steps {
+                sh 'python3 -m venv venv'
+                sh '. venv/bin/activate && pip install -r requirements.txt'
+            }
+        }
+
+        stage('Start Redis') {
+            steps {
+                sh 'docker run -d -p 6379:6379 --name test-redis redis:latest'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh '. venv/bin/activate && python3 runner.py'
+                sh '. venv/bin/activate && pytest test_endpoints.py'
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker stop test-redis || true'
+            sh 'docker rm test-redis || true'
+        }
+    }
+}
+
+```
+
+
+
 ## Notes
 
 * Redis data is cleared before and after each test run (using 'Clean up' function. 
