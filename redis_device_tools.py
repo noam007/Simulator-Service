@@ -130,7 +130,7 @@ async def main():
         print("2. Create multiple sample devices")
         print("3. Delete all devices")
         print("4. Get all device names")
-        print("5. Add a comment to a device")
+        print("5. Add a comment to a device (N/A")
         print("6. Modify field value")
         print("7. Exit")
 
